@@ -3,6 +3,7 @@ package models;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 import edu.unb.fga.dadosabertos.Deputado;
 

@@ -30,7 +30,16 @@ public class PartidosTableModel implements TableModel {
 
 	@Override
 	public Class<?> getColumnClass(int columnIndex) {
-		return String.class;
+		switch (columnIndex) {
+		case 0:
+			return String.class;
+		case 1:
+			return String.class;
+		case 2: 
+			return Integer.class;
+		default:
+			return String.class;
+		}
 	}
 
 	@Override
@@ -41,7 +50,7 @@ public class PartidosTableModel implements TableModel {
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		Partido partido = model.getPartidos().get(rowIndex);
-		String value = null;
+		Object value = null;
 		switch (columnIndex) {
 		case 0:
 			value = partido.getSigla();
@@ -50,7 +59,7 @@ public class PartidosTableModel implements TableModel {
 			value = partido.getNome();
 			break;
 		case 2:
-			value = model.getCountForIndex(rowIndex).toString();
+			value = model.getCountForIndex(rowIndex);
 			break;
 		default:
 			break;
