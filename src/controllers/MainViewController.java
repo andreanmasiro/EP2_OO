@@ -1,6 +1,8 @@
 package controllers;
-import java.awt.Dimension;
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.*;
@@ -8,16 +10,14 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import models.CamaraModelDelegate;
-import models.DeputadosTableModel;
 import models.CamaraModel;
 
 public class MainViewController extends JFrame implements CamaraModelDelegate {
 	
 	private JTabbedPane tabbedPane;
+	private JTextField searchTextField;
 	private ArrayList<JTable> tables = new ArrayList<JTable>();
 	private ArrayList<TableModel> models = new ArrayList<TableModel>();
-	private TableModel depsModel;
-	private TableModel partiesModel;
 	
 	private TableRowSorter<TableModel> depsModelSorter;
 	private TableRowSorter<TableModel> partiesModelSorter;
@@ -26,16 +26,42 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 		CamaraModel.getInstance().addListenerForDeps(this);
 		CamaraModel.getInstance().addListenerForParties(this);
 		
-		this.depsModel = depsModel;
-		this.partiesModel = partiesModel;
-		
 		tabbedPane = new JTabbedPane();
 		
 		tabbedPane.insertTab("Deputados", null, initializePanelWithModel(depsModel), null, 0);
 		tabbedPane.insertTab("Partidos", null, initializePanelWithModel(partiesModel), null, 1);
-		getContentPane().add(tabbedPane);		
+		
+		searchTextField = new JTextField();
+		searchTextField.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Action performed");
+				String text = searchTextField.getText();
+				TableRowSorter<TableModel> sorter = null;
+				
+				switch (tabbedPane.getSelectedIndex()) {
+				case 0:
+					sorter = depsModelSorter;
+					break;
+				case 1:
+					sorter = partiesModelSorter;
+				default:
+					break;
+				}
+				
+				if (text.length() == 0) {
+					sorter.setRowFilter(null);
+				} else {
+					sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
+				}
+			}
+		});
+		
+		getContentPane().add(tabbedPane, BorderLayout.SOUTH);
+		getContentPane().add(searchTextField, BorderLayout.NORTH);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		setSize(1024, 768); 
+		setSize(800, 600); 
 		setVisible(true);
 		
 		depsModelSorter = new TableRowSorter<TableModel>(depsModel);
@@ -43,13 +69,11 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 		
 		tables.get(0).setRowSorter(depsModelSorter);
 		tables.get(1).setRowSorter(partiesModelSorter);
-		
-		filter();
 	}
 	
 	private JPanel initializePanelWithModel(TableModel model) {
 		JPanel panel = new JPanel();
-//		panel.setLayout(new GridLayout(1, 1));
+		panel.setLayout(new GridLayout(1, 1));
 		JTable table = new JTable(model); 
 		tables.add(table);
 		models.add(model);
@@ -63,8 +87,7 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 	public void updateData() {
 		for (int i = 0; i < tables.size(); i++) {
 			JTable table = tables.get(i); 
-			table.setSize(new Dimension(table.getWidth() + 1, table.getHeight()));
-			TableRowSorter<TableModel> t = new TableRowSorter<>();
+			table.setSize(table.getWidth() + 1, table.getHeight());
 		}
 	}
 	
