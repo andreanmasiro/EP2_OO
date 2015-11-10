@@ -46,5 +46,16 @@ public class Partido {
         this.nome = nome;
     }
     
+    @Override
+    public boolean equals(Object obj) {
+    	if (obj instanceof Partido) {
+			return ((Partido)obj).getSigla().equals(getSigla());
+		}
+    	return super.equals(obj);
+    }
     
+    @Override
+    public String toString() {
+    	return this.sigla + "\n";
+    }
 }

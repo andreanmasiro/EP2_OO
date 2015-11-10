@@ -1,19 +1,15 @@
 package models;
 
-import java.io.IOException;
-import java.util.List;
-
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 
-import javax.xml.bind.JAXBException;
-
-import edu.unb.fga.dadosabertos.Camara;
 import edu.unb.fga.dadosabertos.Deputado;
 
-public class DeputadosModel implements TableModel {
+public class DeputadosTableModel implements TableModel {
+
 	
-	private Camara camara;
+	private CamaraModel model = CamaraModel.getInstance();
+	
 	private String[] columnNames = {"Nome",
 			"Partido",
 			"Estado",
@@ -21,41 +17,15 @@ public class DeputadosModel implements TableModel {
 			"Telefone",
 			"Condição"};
 	
-	public DeputadosModel() {
-		camara = new Camara();
-		loadCamara();
-	}
-	
-	public void loadCamara() {
-		if (camara != null) {
-			try { 
-				System.out.println("Carregando dados da camara.");
-				camara.obterDados();
-				System.out.println("Carregando dados dos deputados.");
-				for (Deputado deputado : getDeputados()) {
-//					deputado.obterDetalhes();
-				}
-			} catch (IOException e) {
-				
-			} catch (JAXBException e) {
-				
-			}
-		}
-	}
-	
-	public List<Deputado> getDeputados() {
-		return camara.getDeputados();
-	}
-
 	@Override
 	public int getRowCount() {
-		return getDeputados().size();
+		return model.getDeputados().size();
 	}
 
 	@Override
 	public int getColumnCount() {
 		// Nome, Partido, Estado, Email, Telefone e Condição.
-		return 6;
+		return columnNames.length;
 	}
 
 	@Override
@@ -75,7 +45,7 @@ public class DeputadosModel implements TableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		Deputado deputado = getDeputados().get(rowIndex);
+		Deputado deputado = model.getDeputados().get(rowIndex);
 		String value = null;
 		switch (columnIndex) {
 		case 0:
@@ -116,5 +86,4 @@ public class DeputadosModel implements TableModel {
 	public void removeTableModelListener(TableModelListener l) {
 		
 	}
-	
 }
