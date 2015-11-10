@@ -189,4 +189,9 @@ public class Deputado {
         return detalhes;
     }
     
+    @Override
+    public String toString() {
+    	return this.getNome() + " " + this.getEmail() + "\n";
+    }
+    
 }
