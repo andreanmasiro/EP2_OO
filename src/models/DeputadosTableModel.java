@@ -1,6 +1,7 @@
 package models;
 
 import javax.swing.event.TableModelListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 import edu.unb.fga.dadosabertos.Deputado;
@@ -8,7 +9,11 @@ import edu.unb.fga.dadosabertos.Deputado;
 public class DeputadosTableModel implements TableModel {
 
 	
-	private CamaraModel model = CamaraModel.getInstance();
+	private CamaraModel model;
+	
+	public DeputadosTableModel() {
+		model = CamaraModel.getInstance();
+	}
 	
 	private String[] columnNames = {"Nome",
 			"Partido",
@@ -19,6 +24,9 @@ public class DeputadosTableModel implements TableModel {
 	
 	@Override
 	public int getRowCount() {
+			if (model.getDeputados() == null) {
+				return 0;
+			}
 		return model.getDeputados().size();
 	}
 

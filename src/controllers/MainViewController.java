@@ -1,37 +1,57 @@
 package controllers;
+import java.awt.Dimension;
 import java.awt.GridLayout;
-import javax.swing.*;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
+import java.util.ArrayList;
 
-public class MainViewController extends JFrame {
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import models.CamaraModelDelegate;
+import models.CamaraModel;
+
+public class MainViewController extends JFrame implements CamaraModelDelegate {
 	
-	JPanel depsPanel;
-	JPanel partiesPanel;
-    JTable depsTable;
-    JTable partiesTable;
-    JScrollPane depsTableScrollPane;
-    JScrollPane partiesTableScrollPane;
-    JTabbedPane tabbedPane;
+	JTabbedPane tabbedPane;
+	ArrayList<JTable> tables = new ArrayList<JTable>();
+	ArrayList<TableModel> models = new ArrayList<TableModel>();
+	TableModel depsModel;
+	TableModel partiesModel;
 
 	public MainViewController(TableModel depsModel, TableModel partiesModel) {
-		tabbedPane = new JTabbedPane();
-		depsPanel = new JPanel();
-		depsPanel.setLayout(new GridLayout(1, 1));
-		depsTable = new JTable(depsModel); 
-		depsTableScrollPane = new JScrollPane(depsTable);
-		depsPanel.add(depsTableScrollPane);
-		tabbedPane.insertTab("Deputados", null, depsPanel, null, 0);
+		CamaraModel.getInstance().addListenerForDeps(this);
+		CamaraModel.getInstance().addListenerForParties(this);
 		
-		partiesPanel = new JPanel();
-		partiesPanel.setLayout(new GridLayout(1, 1));
-		partiesTable = new JTable(partiesModel);
-		partiesTableScrollPane = new JScrollPane(partiesTable);
-		partiesPanel.add(partiesTableScrollPane);
-		tabbedPane.insertTab("Partidos", null, partiesPanel, null, 1);	
+		this.depsModel = depsModel;
+		this.partiesModel = partiesModel;
+		
+		tabbedPane = new JTabbedPane();
+		
+		tabbedPane.insertTab("Deputados", null, initializePanelWithModel(depsModel), null, 0);
+		tabbedPane.insertTab("Partidos", null, initializePanelWithModel(partiesModel), null, 1);
 		getContentPane().add(tabbedPane);		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(500, 120); 
 		setVisible(true);
+	}
+	
+	private JPanel initializePanelWithModel(TableModel model) {
+		JPanel panel = new JPanel();
+		panel.setLayout(new GridLayout(1, 1));
+		JTable table = new JTable(model); 
+		tables.add(table);
+		models.add(model);
+		JScrollPane scrollPane = new JScrollPane(table);
+		panel.add(scrollPane);
+		
+		return panel;
+	}
+	
+	@Override
+	public void updateData() {
+		for (int i = 0; i < tables.size(); i++) {
+			JTable table = tables.get(i); 
+			table.setSize(new Dimension(table.getWidth() + 1, table.getHeight()));
+		}
+//		reloadDepsPanelWithModel(depsModel);
+//		reloadPartiesPanelWithModel(partiesModel);
 	}
 }

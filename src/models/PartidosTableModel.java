@@ -10,7 +10,7 @@ public class PartidosTableModel implements TableModel {
 
 	private CamaraModel model = CamaraModel.getInstance();
 	
-	private String[] columnNames = {"Sigla", "Nome", "ID"};
+	private String[] columnNames = {"Sigla", "Nome", "Numero de deputados"};
 	
 	@Override
 	public int getRowCount() {
@@ -50,7 +50,7 @@ public class PartidosTableModel implements TableModel {
 			value = partido.getNome();
 			break;
 		case 2:
-			value = partido.getIdPartido();
+			value = model.getCountForIndex(rowIndex).toString();
 			break;
 		default:
 			break;

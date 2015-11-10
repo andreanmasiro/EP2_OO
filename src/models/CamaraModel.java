@@ -15,7 +15,7 @@ import edu.unb.fga.dadosabertos.Partido;
 
 public class CamaraModel {
 	
-	public static CamaraModel instance;
+	private static CamaraModel instance;
 	public static CamaraModel getInstance() {
 		if (instance == null) {
 			instance = new CamaraModel();
@@ -26,29 +26,51 @@ public class CamaraModel {
 	private Camara camara;
 	
 	private List<Partido> partidos;
+	private List<Integer> partidosCount;
+	
+	private ArrayList<CamaraModelDelegate> depsListeners = new ArrayList<CamaraModelDelegate>();
+	private ArrayList<CamaraModelDelegate> partiesListeners = new ArrayList<CamaraModelDelegate>();
 	
 	private CamaraModel() {
 		partidos = new ArrayList<Partido>();
+		partidosCount = new ArrayList<Integer>();
 		camara = new Camara();
 		loadCamara();
 	}
 	
 	public void loadCamara() {
 		if (camara != null) {
-			try { 
-				camara.obterDados();
-				for (Deputado deputado : getDeputados()) {
-					deputado.obterDetalhes();
-					if (!partidos.contains(deputado.getDetalhes().getPartido())) {
-						partidos.add(deputado.getDetalhes().getPartido());
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try { 
+						System.out.println("Obtendo dados.");
+						camara.obterDados();
+						for (CamaraModelDelegate listener : depsListeners) {
+							listener.updateData();
+						}
+						System.out.println("Dados iniciais obtidos.");
+						for (Deputado deputado : getDeputados()) {
+							deputado.obterDetalhes();
+							Partido partido = deputado.getDetalhes().getPartido();
+							if (!partidos.contains(partido)) {
+								partidos.add(partido);
+								partidosCount.add(new Integer(0));
+								for (CamaraModelDelegate listener : partiesListeners) {
+									listener.updateData();
+								}
+							}
+							int index = partidos.indexOf(partido);
+							partidosCount.set(index, partidosCount.get(index) + 1);
+						}
+						System.out.println(partidos);
+					} catch (IOException e) {
+						
+					} catch (JAXBException e) {
+						
 					}
 				}
-				System.out.println(partidos);
-			} catch (IOException e) {
-				
-			} catch (JAXBException e) {
-				
-			}
+			}).start();
 		}
 	}
 	
@@ -58,6 +80,22 @@ public class CamaraModel {
 	
 	public List<Partido> getPartidos() {
 		return partidos;
+	}
+	
+	public Integer getCountForIndex(int index) {
+		return partidosCount.get(index);
+	}
+	
+	public void addListenerForDeps(CamaraModelDelegate listener) {
+		if (!depsListeners.contains(listener)) {
+			depsListeners.add(listener);
+		}
+	}
+	
+	public void addListenerForParties(CamaraModelDelegate listener) {
+		if (!partiesListeners.contains(listener)) {
+			partiesListeners.add(listener);
+		}
 	}
 	
 }
