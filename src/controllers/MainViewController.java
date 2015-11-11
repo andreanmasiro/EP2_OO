@@ -125,6 +125,7 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(800, 600); 
+		setResizable(false);
 		setVisible(true);
 		
 		depsModelSorter = new TableRowSorter<TableModel>(depsModel);

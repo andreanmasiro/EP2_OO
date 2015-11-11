@@ -51,8 +51,14 @@ public class CamaraModel {
 							listener.depsDataHaveLoaded();
 						}
 						System.out.println("Dados iniciais obtidos.");
-						for (Deputado deputado : getDeputados()) {
-							deputado.obterDetalhes();
+						for (int i = 0; i < getDeputados().size(); i++) {
+							Deputado deputado = getDeputados().get(i);
+							try {
+								deputado.obterDetalhes();
+							} catch (NullPointerException e) {
+								i--;
+								continue;
+							}
 							Partido partido = deputado.getDetalhes().getPartido();
 							if (!partidos.contains(partido)) {
 								partidos.add(partido);
