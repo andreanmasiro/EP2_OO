@@ -1,6 +1,11 @@
 package controllers;
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -16,11 +21,15 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 	
 	private JTabbedPane tabbedPane;
 	private JTextField searchTextField;
-	private ArrayList<JTable> tables = new ArrayList<JTable>();
-	private ArrayList<TableModel> models = new ArrayList<TableModel>();
+	private JTable depsTable;
+	private JTable partiesTable;
+
 	
 	private TableRowSorter<TableModel> depsModelSorter;
 	private TableRowSorter<TableModel> partiesModelSorter;
+	
+	private JLabel depsModelStateLabel;
+	private JLabel partiesModelStateLabel;
 	
 	public MainViewController(TableModel depsModel, TableModel partiesModel) {
 		CamaraModel.getInstance().addListenerForDeps(this);
@@ -28,10 +37,51 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 		
 		tabbedPane = new JTabbedPane();
 		
-		tabbedPane.insertTab("Deputados", null, initializePanelWithModel(depsModel), null, 0);
-		tabbedPane.insertTab("Partidos", null, initializePanelWithModel(partiesModel), null, 1);
+		depsModelStateLabel = new JLabel("Carregando dados.");
+		depsModelStateLabel.setSize(depsModelStateLabel.getWidth(), 100);
+		partiesModelStateLabel = new JLabel("Carregando dados.");
+		
+		JPanel depsPanel = new JPanel();
+		depsPanel.setLayout(new GridBagLayout());
+		depsTable = initializeTableWithModel(depsModel);
+		JScrollPane dScrollPane = new JScrollPane(depsTable);
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		depsPanel.add(depsModelStateLabel, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0.5;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.ipady = 200;
+		
+		depsPanel.add(dScrollPane, c);
+		
+		JPanel partiesPanel = new JPanel();
+		partiesPanel.setLayout(new GridBagLayout());
+		partiesTable = initializeTableWithModel(partiesModel);
+		JScrollPane pScrollPane = new JScrollPane(partiesTable);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.ipady = 0;
+		partiesPanel.add(partiesModelStateLabel, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0.5;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.ipady = 200;
+		partiesPanel.add(pScrollPane, c);
+		
+		tabbedPane.insertTab("Deputados", null, depsPanel, null, 0);
+		tabbedPane.insertTab("Partidos", null, partiesPanel, null, 1);
 		
 		searchTextField = new JTextField();
+		searchTextField.setMaximumSize(searchTextField.getMinimumSize());
 		searchTextField.addActionListener(new ActionListener() {
 			
 			@Override
@@ -58,8 +108,21 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 			}
 		});
 		
-		getContentPane().add(tabbedPane, BorderLayout.SOUTH);
-		getContentPane().add(searchTextField, BorderLayout.NORTH);
+		setLayout(new GridBagLayout());
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.ipady = 0;
+		getContentPane().add(searchTextField, c);
+		
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = 0.5;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.ipady = 200;
+		getContentPane().add(tabbedPane, c);
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setSize(800, 600); 
 		setVisible(true);
@@ -67,33 +130,29 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 		depsModelSorter = new TableRowSorter<TableModel>(depsModel);
 		partiesModelSorter = new TableRowSorter<TableModel>(partiesModel);
 		
-		tables.get(0).setRowSorter(depsModelSorter);
-		tables.get(1).setRowSorter(partiesModelSorter);
+		depsTable.setRowSorter(depsModelSorter);
+		partiesTable.setRowSorter(partiesModelSorter);
 	}
 	
-	private JPanel initializePanelWithModel(TableModel model) {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(1, 1));
-		JTable table = new JTable(model); 
-		tables.add(table);
-		models.add(model);
-		JScrollPane scrollPane = new JScrollPane(table);
-		panel.add(scrollPane);
-		
-		return panel;
+	private JTable initializeTableWithModel(TableModel model) {
+		return new JTable(model);
+	}
+	
+	static int x = 1;
+	@Override
+	public void updateData() {
+		depsTable.setSize(depsTable.getWidth() + x, depsTable.getHeight());
+		partiesTable.setSize(partiesTable.getWidth() + x, partiesTable.getHeight());
+		x = -x;
 	}
 	
 	@Override
-	public void updateData() {
-		for (int i = 0; i < tables.size(); i++) {
-			JTable table = tables.get(i); 
-			table.setSize(table.getWidth() + 1, table.getHeight());
-		}
+	public void depsDataHaveLoaded() {
+		depsModelStateLabel.setText("Dados dos deputados.");
 	}
 	
-	private void filter() {
-//		RowFilter<TableModel, Object> rf = null;
-//		rf = RowFilter.regexFilter("");
-//		depsModelSorter.setRowFilter(rf);
-	}
+	@Override
+	public void partiesDataHaveLoaded() {
+		partiesModelStateLabel.setText("Dados dos partidos.");
+	}	
 }
