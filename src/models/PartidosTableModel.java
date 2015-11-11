@@ -2,8 +2,6 @@ package models;
 
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
-
-import edu.unb.fga.dadosabertos.Deputado;
 import edu.unb.fga.dadosabertos.Partido;
 
 public class PartidosTableModel implements TableModel {

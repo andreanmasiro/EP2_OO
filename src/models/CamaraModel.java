@@ -4,9 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.event.TableModelListener;
-import javax.swing.table.TableModel;
-
 import javax.xml.bind.JAXBException;
 
 import edu.unb.fga.dadosabertos.Camara;

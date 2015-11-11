@@ -1,15 +1,9 @@
 package controllers;
-import java.awt.BorderLayout;
-import java.awt.ComponentOrientation;
-import java.awt.FlowLayout;
+
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -35,6 +29,10 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 		CamaraModel.getInstance().addListenerForDeps(this);
 		CamaraModel.getInstance().addListenerForParties(this);
 		
+		initUI(depsModel, partiesModel);
+	}
+
+	private void initUI(TableModel depsModel, TableModel partiesModel) {
 		tabbedPane = new JTabbedPane();
 		
 		depsModelStateLabel = new JLabel("Carregando dados.");
@@ -149,11 +147,12 @@ public class MainViewController extends JFrame implements CamaraModelDelegate {
 	
 	@Override
 	public void depsDataHaveLoaded() {
-		depsModelStateLabel.setText("Dados dos deputados.");
+		depsModelStateLabel.setText("Obtendo detalhes dos deputados.");
 	}
 	
 	@Override
 	public void partiesDataHaveLoaded() {
 		partiesModelStateLabel.setText("Dados dos partidos.");
+		depsModelStateLabel.setText("Dados dos deputados.");
 	}	
 }
